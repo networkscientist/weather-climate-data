@@ -110,16 +110,38 @@ qc_statistical('Pn_Sunrise')
 
 # 4. Test: Sequence Analysis - Are there huge difference for consecutive days? Are there too many same values for consecutive days?
 print("QC: 4. Sequence Analysis:")
-def qc_sequence(col_name, difference):
+def qc_sequence_diff(col_name, difference):
     for index, row in df.iterrows():
-        # if abs(row[col_name]-df.at[row[col_name].index],[col_name]) >= difference:
-        #     counter = 0
-        #     print(row)
-        #     counter += 1
-        #     print(counter, " possible error found")
+        try:
+            if abs(df.at[index,col_name]-df.at[index+1,col_name]) >= difference:
+                # counter = 0
+                print("Possible error found:")
+                print("Value 1: ", df.at[index,col_name], " Row: ", index)
+                print("Value 2: ", df.at[index+1,col_name], " Row: ", index+1)
+                # counter += 1
+                # print(counter, " possible error found")
+        except KeyError:
+            continue
 
-qc_sequence('Tc_Sunset', 25)
+def qc_sequence_same(col_name):
+    for index, row in df.iterrows():
+        try:
+            if df.at[index,col_name] == df.at[index+1,col_name] == df.at[index+2,col_name]== df.at[index+3,col_name]:
+                print("Possible error found:")
+                print("Value: ", df.at[index,col_name], " Rows: ", index, " to ", index+3)
+        except KeyError:
+            continue
 
+#Test for huge differences between 2 consecutive days
+qc_sequence_diff('Tc_Sunset', 25)
+qc_sequence_diff('Tc_Sunrise', 25)
+qc_sequence_diff('Pn_Sunset', 40)
+qc_sequence_diff('Pn_Sunrise', 40)
+#Test for same values on four consecutive days
+qc_sequence_same('Tc_Sunset')
+qc_sequence_same('Tc_Sunrise')
+qc_sequence_same('Pn_Sunset')
+qc_sequence_same('Pn_Sunrise')
 ## Create figure and plot space
 fig, ax = plt.subplots(figsize=(10, 10))
 
